@@ -267,12 +267,14 @@ class MaskFormer(nn.Module):
         for targets_per_image in targets:
             # pad gt
             gt_masks = targets_per_image.gt_masks
-            padded_masks = torch.zeros((gt_masks.shape[0], h_pad, w_pad), dtype=gt_masks.dtype, device=gt_masks.device)
-            padded_masks[:, : gt_masks.shape[1], : gt_masks.shape[2]] = gt_masks
+
+            #padded_masks = torch.zeros((gt_masks.shape[0], h_pad, w_pad), dtype=gt_masks.dtype, device=gt_masks.device)
+            #padded_masks[:, : gt_masks.shape[1], : gt_masks.shape[2]] = gt_masks
             new_targets.append(
                 {
                     "labels": targets_per_image.gt_classes,
-                    "masks": padded_masks,
+                    #"masks": padded_masks,
+                    "masks": gt_masks.tensor,
                 }
             )
         return new_targets

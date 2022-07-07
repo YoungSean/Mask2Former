@@ -25,7 +25,7 @@ import torch
 import detectron2.utils.comm as comm
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import get_cfg
-from detectron2.data import MetadataCatalog, build_detection_train_loader
+from detectron2.data import MetadataCatalog, build_detection_train_loader, DatasetMapper
 from detectron2.engine import (
     DefaultTrainer,
     default_argument_parser,
@@ -148,29 +148,32 @@ class Trainer(DefaultTrainer):
 
     @classmethod
     def build_train_loader(cls, cfg):
-        # Semantic segmentation dataset mapper
-        if cfg.INPUT.DATASET_MAPPER_NAME == "mask_former_semantic":
-            mapper = MaskFormerSemanticDatasetMapper(cfg, True)
-            return build_detection_train_loader(cfg, mapper=mapper)
-        # Panoptic segmentation dataset mapper
-        elif cfg.INPUT.DATASET_MAPPER_NAME == "mask_former_panoptic":
-            mapper = MaskFormerPanopticDatasetMapper(cfg, True)
-            return build_detection_train_loader(cfg, mapper=mapper)
-        # Instance segmentation dataset mapper
-        elif cfg.INPUT.DATASET_MAPPER_NAME == "mask_former_instance":
-            mapper = MaskFormerInstanceDatasetMapper(cfg, True)
-            return build_detection_train_loader(cfg, mapper=mapper)
-        # coco instance segmentation lsj new baseline
-        elif cfg.INPUT.DATASET_MAPPER_NAME == "coco_instance_lsj":
-            mapper = COCOInstanceNewBaselineDatasetMapper(cfg, True)
-            return build_detection_train_loader(cfg, mapper=mapper)
-        # coco panoptic segmentation lsj new baseline
-        elif cfg.INPUT.DATASET_MAPPER_NAME == "coco_panoptic_lsj":
-            mapper = COCOPanopticNewBaselineDatasetMapper(cfg, True)
-            return build_detection_train_loader(cfg, mapper=mapper)
-        else:
-            mapper = None
-            return build_detection_train_loader(cfg, mapper=mapper)
+        dataloader = build_detection_train_loader(cfg,
+                                                  mapper=DatasetMapper(cfg, is_train=True))
+        return dataloader
+        # # Semantic segmentation dataset mapper
+        # if cfg.INPUT.DATASET_MAPPER_NAME == "mask_former_semantic":
+        #     mapper = MaskFormerSemanticDatasetMapper(cfg, True)
+        #     return build_detection_train_loader(cfg, mapper=mapper)
+        # # Panoptic segmentation dataset mapper
+        # elif cfg.INPUT.DATASET_MAPPER_NAME == "mask_former_panoptic":
+        #     mapper = MaskFormerPanopticDatasetMapper(cfg, True)
+        #     return build_detection_train_loader(cfg, mapper=mapper)
+        # # Instance segmentation dataset mapper
+        # elif cfg.INPUT.DATASET_MAPPER_NAME == "mask_former_instance":
+        #     mapper = MaskFormerInstanceDatasetMapper(cfg, True)
+        #     return build_detection_train_loader(cfg, mapper=mapper)
+        # # coco instance segmentation lsj new baseline
+        # elif cfg.INPUT.DATASET_MAPPER_NAME == "coco_instance_lsj":
+        #     mapper = COCOInstanceNewBaselineDatasetMapper(cfg, True)
+        #     return build_detection_train_loader(cfg, mapper=mapper)
+        # # coco panoptic segmentation lsj new baseline
+        # elif cfg.INPUT.DATASET_MAPPER_NAME == "coco_panoptic_lsj":
+        #     mapper = COCOPanopticNewBaselineDatasetMapper(cfg, True)
+        #     return build_detection_train_loader(cfg, mapper=mapper)
+        # else:
+        #     mapper = None
+        #     return build_detection_train_loader(cfg, mapper=mapper)
 
     @classmethod
     def build_lr_scheduler(cls, cfg, optimizer):
