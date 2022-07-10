@@ -1,4 +1,5 @@
 # check some functions
+from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.modeling import build_model
 
 from lib.datasets.tabletop_dataset import TableTopDataset, getTabletopDataset
@@ -66,12 +67,18 @@ def add_tabletop_config(cfg):
     cfg.INPUT.MASK_FORMAT = "bitmask"  # alternative: "polygon"
     cfg.MODEL.MASK_ON = True
     cfg.DATASETS.TRAIN = ("tabletop_object_train",)
-    cfg.DATASETS.TEST= ("tabletop_object_test",)
+    # cfg.DATASETS.TEST= ("tabletop_object_test",)
+    cfg.DATASETS.TEST = ()
     cfg.INPUT.MIN_SIZE_TRAIN = (480,)
     cfg.INPUT.MIN_SIZE_TEST = (480,)
     cfg.INPUT.MAX_SIZE_TRAIN = 800
     cfg.INPUT.MAX_SIZE_TEST = 800
+    cfg.SOLVER.MAX_ITER = 2000
     #cfg.INPUT.CROP.ENABLED = False
+    cfg.MODEL.WEIGHTS = "./output/model_final.pth"
+    cfg.INPUT.MIN_SIZE_TEST = 0
+    cfg.MODEL.MASK_FORMER.TEST.SEMANTIC_ON = False
+    cfg.MODEL.MASK_FORMER.TEST.INSTANCE_ON = True
 
 cfg = get_cfg()
 add_deeplab_config(cfg)
@@ -93,7 +100,7 @@ dataloader = build_detection_train_loader(cfg,
 # cfg.MODEL.MASK_FORMER.TEST.SEMANTIC_ON = True
 # cfg.MODEL.MASK_FORMER.TEST.INSTANCE_ON = True
 # cfg.MODEL.MASK_FORMER.TEST.PANOPTIC_ON = True
-model = build_model(cfg)
+# model = build_model(cfg)
 # predictor = DefaultPredictor(cfg)
 # for x in dataloader:
 #     #print(x)
@@ -114,8 +121,45 @@ model = build_model(cfg)
 # cv2.waitKey(0)
 # # #closing all open windows
 # cv2.destroyAllWindows()
+def visualizeResult():
+    im = cv2.imread("./rgb_00004.jpeg")
+    predictor = DefaultPredictor(cfg)
+    outputs = predictor(im)
+    # print(f"scores: ", outputs["instances"].scores)
+    # print("result number: ", len(outputs["instances"].scores))
+    # filter_result = outputs["instances"].scores > 0.2
+    # print(filter_result)
+    # indices = torch.nonzero(filter_result)
+    # print(indices.shape)
+    # indices = torch.squeeze(indices)
+    # print(indices.shape)
+
+
+
+    v = Visualizer(im[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2)
+    instances = outputs["instances"]
+    confident_detections = instances[instances.scores > 0.3]
+
+    out = v.draw_instance_predictions(confident_detections.to("cpu"))
+    cv2.imshow("image", out.get_image()[:, :, ::-1])
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
 if __name__ == '__main__':
-   trainer = Trainer(cfg)
-   trainer.resume_or_load(resume=False)
-   trainer.train()
+    # trainer = Trainer(cfg)
+    # trainer.resume_or_load()
+    # trainer.train()
+
+    #cfg.MODEL.WEIGHTS = "./output/model_final.pth"
+
+    visualizeResult()
+
+
+
+
+
+#closing all open windows
+
+
+
 print("done!")
