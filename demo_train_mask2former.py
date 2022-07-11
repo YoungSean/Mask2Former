@@ -145,6 +145,7 @@ def visualizeResult():
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
+
 if __name__ == '__main__':
     # trainer = Trainer(cfg)
     # trainer.resume_or_load()
