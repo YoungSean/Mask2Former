@@ -18,7 +18,7 @@ import cv2
 import torch
 from torch.utils.data import DataLoader
 #from google.colab.patches import cv2_imshow
-from tabletop_dataset import TableTopDataset, getTabletopDataset
+from datasets.tabletop_dataset import TableTopDataset, getTabletopDataset
 # import some common detectron2 utilities
 from detectron2 import model_zoo
 from detectron2.engine import DefaultPredictor
@@ -128,6 +128,10 @@ def train_loop(dataloader, model, optimizer):
         if batch % 10 == 0:
             losses, current = losses.item(), batch * len(X)
             print(f"loss: {losses:}  ")
+
+        if batch == 30:
+            break
+
 
 train_loop(dataloader, model, optimizer)
 # predictor = DefaultPredictor(cfg)
