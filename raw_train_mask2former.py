@@ -16,8 +16,9 @@ setup_logger(name="mask2former")
 import numpy as np
 import cv2
 import torch
+from torch.utils.data import DataLoader
 #from google.colab.patches import cv2_imshow
-
+from tabletop_dataset import TableTopDataset, getTabletopDataset
 # import some common detectron2 utilities
 from detectron2 import model_zoo
 from detectron2.engine import DefaultPredictor
@@ -87,8 +88,8 @@ cfg_file = "configs/coco/instance-segmentation/maskformer2_R50_bs16_50ep.yaml"
 #cfg_file = "configs/cityscapes/instance-segmentation/Base-Cityscapes-InstanceSegmentation.yaml"
 cfg.merge_from_file(cfg_file)
 add_tabletop_config(cfg)
-# dataloader = build_detection_train_loader(cfg,
-#    mapper=DatasetMapper(cfg, is_train=True))
+dataloader = build_detection_train_loader(cfg,
+   mapper=DatasetMapper(cfg, is_train=True))
 # if cfg.INPUT.DATASET_MAPPER_NAME == "coco_instance_lsj":
 #     mapper = COCOInstanceNewBaselineDatasetMapper(cfg, True)
 # elif cfg.INPUT.DATASET_MAPPER_NAME == "mask_former_instance":
@@ -100,7 +101,35 @@ add_tabletop_config(cfg)
 # cfg.MODEL.MASK_FORMER.TEST.SEMANTIC_ON = True
 # cfg.MODEL.MASK_FORMER.TEST.INSTANCE_ON = True
 # cfg.MODEL.MASK_FORMER.TEST.PANOPTIC_ON = True
-# model = build_model(cfg)
+
+model = build_model(cfg)
+model.cuda()
+learning_rate = 1e-4
+optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+times = 0
+# for x in dataloader:
+#     print(model(x))
+#     times += 1
+#     if times == 2:
+#         break
+
+
+def train_loop(dataloader, model, optimizer):
+    for batch, X in enumerate(dataloader):
+        # Compute prediction and loss
+        loss_dict = model(X)
+        losses = sum(loss_dict.values())
+
+        # Backpropagation
+        optimizer.zero_grad()
+        losses.backward()
+        optimizer.step()
+
+        if batch % 10 == 0:
+            losses, current = losses.item(), batch * len(X)
+            print(f"loss: {losses:}  ")
+
+train_loop(dataloader, model, optimizer)
 # predictor = DefaultPredictor(cfg)
 # for x in dataloader:
 #     #print(x)
@@ -146,10 +175,10 @@ def visualizeResult():
     cv2.destroyAllWindows()
 
 
-if __name__ == '__main__':
-    trainer = Trainer(cfg)
-    trainer.resume_or_load()
-    trainer.train()
+# if __name__ == '__main__':
+#     trainer = Trainer(cfg)
+#     trainer.resume_or_load()
+#     trainer.train()
 
     #cfg.MODEL.WEIGHTS = "./output/model_final.pth"
 
