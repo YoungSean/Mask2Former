@@ -43,7 +43,7 @@ from mask2former import (
 
 # import Mask2Former project
 from mask2former import add_maskformer2_config
-
+from tabletop_config import add_tabletop_config
 #im = cv2.imread("./input.jpg")
 
 #DatasetCatalog.register("tabletop_object_train", getTabletopDataset)
@@ -61,24 +61,6 @@ metadata = MetadataCatalog.get("tabletop_object_train")
 # #closing all open windows
 # cv2.destroyAllWindows()
 
-def add_tabletop_config(cfg):
-    cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
-    cfg.SOLVER.IMS_PER_BATCH = 4
-    cfg.INPUT.MASK_FORMAT = "bitmask"  # alternative: "polygon"
-    cfg.MODEL.MASK_ON = True
-    cfg.DATASETS.TRAIN = ("tabletop_object_train",)
-    # cfg.DATASETS.TEST= ("tabletop_object_test",)
-    cfg.DATASETS.TEST = ()
-    cfg.INPUT.MIN_SIZE_TRAIN = (480,)
-    cfg.INPUT.MIN_SIZE_TEST = (480,)
-    cfg.INPUT.MAX_SIZE_TRAIN = 800
-    cfg.INPUT.MAX_SIZE_TEST = 800
-    cfg.SOLVER.MAX_ITER = 2200
-    #cfg.INPUT.CROP.ENABLED = False
-    cfg.MODEL.WEIGHTS = "./output/model_final.pth"
-    cfg.INPUT.MIN_SIZE_TEST = 0
-    cfg.MODEL.MASK_FORMER.TEST.SEMANTIC_ON = False
-    cfg.MODEL.MASK_FORMER.TEST.INSTANCE_ON = True
 
 cfg = get_cfg()
 add_deeplab_config(cfg)
