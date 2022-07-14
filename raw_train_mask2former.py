@@ -114,10 +114,16 @@ times = 0
 def train_loop(dataloader, model, optimizer):
     for batch, X in enumerate(dataloader):
         # Compute prediction and loss
-        # print(X)
+        #print(X)
+        has_empty_instances = False
         for sample in X:
-            if not sample["instances"]:
-                continue
+            if len(sample["instances"]) == 0:
+               has_empty_instances = True
+            # print(sample["instances"])
+            # print(len(sample["instances"]))
+            # return
+        if has_empty_instances:
+            continue
         loss_dict = model(X)
         losses = sum(loss_dict.values())
 
@@ -130,8 +136,8 @@ def train_loop(dataloader, model, optimizer):
             losses, current = losses.item(), batch * len(X)
             print(f"loss: {losses:}  ")
 
-        print(batch)
-        break
+        if batch >= 10:
+            break
 
 #sample = dataset[0]
 train_loop(dataloader, model, optimizer)
