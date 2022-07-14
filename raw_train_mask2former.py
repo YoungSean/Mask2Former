@@ -102,7 +102,7 @@ if use_my_dataset:
 model = build_model(cfg)
 model.cuda()
 learning_rate = 1e-4
-optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
 times = 0
 # for x in dataloader:
 #     print(model(x))
@@ -111,20 +111,27 @@ times = 0
 #         break
 
 
-def train_loop(dataloader, model, optimizer):
+def train_loop(dataloader, model, optimizer, current_epoch=0):
     for batch, X in enumerate(dataloader):
         # Compute prediction and loss
-        #print(X)
-        has_empty_instances = False
+
+        ## Remove the batch containing some samples without objects
+        # has_empty_instances = False
+        # for sample in X:
+        #     if len(sample["instances"]) == 0:
+        #        has_empty_instances = True
+        # if has_empty_instances:
+        #     continue
+        qualified_batch = []
+        # print("before removing: ", len(X))
+
         for sample in X:
-            if len(sample["instances"]) == 0:
-               has_empty_instances = True
-            # print(sample["instances"])
-            # print(len(sample["instances"]))
-            # return
-        if has_empty_instances:
-            continue
+            if len(sample["instances"]) > 0:
+               qualified_batch.append(sample)
+        # print("after removing: ", len(qualified_batch))
+        X = qualified_batch
         loss_dict = model(X)
+        detailed_loss = [(k, round(v.item(), 3)) for k,v in loss_dict.items()]
         losses = sum(loss_dict.values())
 
         # Backpropagation
@@ -132,12 +139,14 @@ def train_loop(dataloader, model, optimizer):
         losses.backward()
         optimizer.step()
 
-        if batch % 10 == 0:
+        if batch % 2 == 0:
             losses, current = losses.item(), batch * len(X)
-            print(f"loss: {losses:}  ")
+            print(f"loss: {losses:.3f}  loss_dict: {detailed_loss}")
 
         if batch >= 10:
+            print(batch)
             break
+
 
 #sample = dataset[0]
 train_loop(dataloader, model, optimizer)

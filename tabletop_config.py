@@ -1,6 +1,6 @@
 def add_tabletop_config(cfg):
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
-    cfg.SOLVER.IMS_PER_BATCH = 8#64 # 16
+    cfg.SOLVER.IMS_PER_BATCH = 4 #8,64,16
     cfg.INPUT.MASK_FORMAT = "bitmask"  # alternative: "polygon"
     cfg.MODEL.MASK_ON = True
     cfg.DATASETS.TRAIN = ("tabletop_object_train",)
@@ -18,7 +18,7 @@ def add_tabletop_config(cfg):
     cfg.MODEL.MASK_FORMER.TEST.INSTANCE_ON = True
 
     # Some configs to be modified
-    cfg.DATALOADER.NUM_WORKERS = 16 # on markov server, try 64
+    cfg.DATALOADER.NUM_WORKERS = 4
 
     # set input data mapper
     cfg.INPUT.DATASET_MAPPER_NAME == "mask_former_instance"

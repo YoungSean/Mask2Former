@@ -11,6 +11,7 @@ sys.path.append(os.path.dirname(__file__))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'lib'))
 
+# ignore some warnings
 import warnings
 warnings.simplefilter("ignore", UserWarning)
 
