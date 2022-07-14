@@ -52,12 +52,15 @@ from mask2former import (
 # import Mask2Former project
 from mask2former import add_maskformer2_config
 from tabletop_config import add_tabletop_config
-
+from torch.utils.data.dataloader import default_collate
 #im = cv2.imread("./input.jpg")
-
+use_my_dataset = True
 #DatasetCatalog.register("tabletop_object_train", getTabletopDataset)
 for d in ["train", "test"]:
-    DatasetCatalog.register("tabletop_object_" + d, lambda d=d: getTabletopDataset(d))
+    if use_my_dataset:
+        DatasetCatalog.register("tabletop_object_" + d, lambda d=d: TableTopDataset(d))
+    else:
+        DatasetCatalog.register("tabletop_object_" + d, lambda d=d: getTabletopDataset(d))
     MetadataCatalog.get("tabletop_object_" + d).set(thing_classes=['__background__', 'object'])
 metadata = MetadataCatalog.get("tabletop_object_train")
 # later, to access the data:
@@ -79,8 +82,11 @@ cfg_file = "configs/coco/instance-segmentation/maskformer2_R50_bs16_50ep.yaml"
 #cfg_file = "configs/cityscapes/instance-segmentation/Base-Cityscapes-InstanceSegmentation.yaml"
 cfg.merge_from_file(cfg_file)
 add_tabletop_config(cfg)
-dataloader = build_detection_train_loader(cfg,
-   mapper=DatasetMapper(cfg, is_train=True))
+if use_my_dataset:
+    dataset = TableTopDataset(image_set="train", data_mapper=True)#, data_mapper=DatasetMapper(cfg, is_train=True))
+    dataloader = build_detection_train_loader(cfg)
+#dataloader = build_detection_train_loader(DatasetRegistry.get("tabletop_object_train"), mapper=DatasetMapper(cfg, is_train=True))
+# dataloader = DataLoader(dataset, batch_size=4)
 # if cfg.INPUT.DATASET_MAPPER_NAME == "coco_instance_lsj":
 #     mapper = COCOInstanceNewBaselineDatasetMapper(cfg, True)
 # elif cfg.INPUT.DATASET_MAPPER_NAME == "mask_former_instance":
@@ -108,6 +114,10 @@ times = 0
 def train_loop(dataloader, model, optimizer):
     for batch, X in enumerate(dataloader):
         # Compute prediction and loss
+        # print(X)
+        for sample in X:
+            if not sample["instances"]:
+                continue
         loss_dict = model(X)
         losses = sum(loss_dict.values())
 
@@ -123,7 +133,7 @@ def train_loop(dataloader, model, optimizer):
         print(batch)
         break
 
-
+#sample = dataset[0]
 train_loop(dataloader, model, optimizer)
 # predictor = DefaultPredictor(cfg)
 # for x in dataloader:
@@ -171,6 +181,7 @@ def visualizeResult():
 
 
 # if __name__ == '__main__':
+#     cfg.SOLVER.MAX_ITER = 2200 + 100
 #     trainer = Trainer(cfg)
 #     trainer.resume_or_load()
 #     trainer.train()

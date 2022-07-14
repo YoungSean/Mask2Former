@@ -148,6 +148,10 @@ class Trainer(DefaultTrainer):
 
     @classmethod
     def build_train_loader(cls, cfg):
+        if cfg.INPUT.DATASET_MAPPER_NAME == "mask_former_instance":
+            mapper = MaskFormerInstanceDatasetMapper(cfg, True)
+            return build_detection_train_loader(cfg, mapper=mapper)
+
         dataloader = build_detection_train_loader(cfg,
                                                   mapper=DatasetMapper(cfg, is_train=True))
         return dataloader
@@ -159,7 +163,7 @@ class Trainer(DefaultTrainer):
         # elif cfg.INPUT.DATASET_MAPPER_NAME == "mask_former_panoptic":
         #     mapper = MaskFormerPanopticDatasetMapper(cfg, True)
         #     return build_detection_train_loader(cfg, mapper=mapper)
-        # # Instance segmentation dataset mapper
+        # Instance segmentation dataset mapper
         # elif cfg.INPUT.DATASET_MAPPER_NAME == "mask_former_instance":
         #     mapper = MaskFormerInstanceDatasetMapper(cfg, True)
         #     return build_detection_train_loader(cfg, mapper=mapper)

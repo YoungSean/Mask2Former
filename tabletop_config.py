@@ -19,3 +19,6 @@ def add_tabletop_config(cfg):
 
     # Some configs to be modified
     cfg.DATALOADER.NUM_WORKERS = 16 # on markov server, try 64
+
+    # set input data mapper
+    cfg.INPUT.DATASET_MAPPER_NAME == "mask_former_instance"
