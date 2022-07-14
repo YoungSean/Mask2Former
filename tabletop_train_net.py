@@ -27,7 +27,7 @@ import copy
 import itertools
 import logging
 import os
-
+import time
 from collections import OrderedDict
 from typing import Any, Dict, List, Set
 
@@ -68,14 +68,13 @@ from mask2former import (
     SemanticSegmentorWithTTA,
     add_maskformer2_config,
 )
-from datasets import tabletop_dataset
+from datasets.tabletop_dataset import TableTopDataset, getTabletopDataset
 from tabletop_config import add_tabletop_config
 
 class Trainer(DefaultTrainer):
     """
     Extension of the Trainer class adapted to MaskFormer.
     """
-
     @classmethod
     def build_evaluator(cls, cfg, dataset_name, output_folder=None):
         """
@@ -97,8 +96,7 @@ class Trainer(DefaultTrainer):
 
     @classmethod
     def build_train_loader(cls, cfg):
-        dataloader = build_detection_train_loader(cfg,
-                                                  mapper=DatasetMapper(cfg, is_train=True))
+        dataloader = build_detection_train_loader(cfg)
         return dataloader
         # # Instance segmentation dataset mapper
         # elif cfg.INPUT.DATASET_MAPPER_NAME == "mask_former_instance":
@@ -221,10 +219,54 @@ class Trainer(DefaultTrainer):
         res = OrderedDict({k + "_TTA": v for k, v in res.items()})
         return res
 
+    def run_step(self):
+        self._trainer.iter = self.iter
+        """
+                Implement the AMP training logic.
+                """
+        assert self._trainer.model.training, "[AMPTrainer] model was changed to eval mode!"
+        assert torch.cuda.is_available(), "[AMPTrainer] CUDA is required for AMP training!"
+        from torch.cuda.amp import autocast
+
+        start = time.perf_counter()
+        data = next(self._trainer._data_loader_iter)
+        qualified_batch = []
+
+        for sample in data:
+            if len(sample["instances"]) > 0:
+                qualified_batch.append(sample)
+        # print("after removing: ", len(qualified_batch))
+        # skip empty batch
+        if len(qualified_batch) == 0:
+            return
+        data = qualified_batch
+        data_time = time.perf_counter() - start
+
+        with autocast():
+            loss_dict = self._trainer.model(data)
+            if isinstance(loss_dict, torch.Tensor):
+                losses = loss_dict
+                loss_dict = {"total_loss": loss_dict}
+            else:
+                losses = sum(loss_dict.values())
+
+        self._trainer.optimizer.zero_grad()
+        self._trainer.grad_scaler.scale(losses).backward()
+
+        self._trainer._write_metrics(loss_dict, data_time)
+
+        self._trainer.grad_scaler.step(self._trainer.optimizer)
+        self._trainer.grad_scaler.update()
+
 # some settings:
 
+# If we do not use detectron2 data mapper, set use_my_dataset as True
+use_my_dataset = True
 for d in ["train", "test"]:
-    DatasetCatalog.register("tabletop_object_" + d, lambda d=d: tabletop_dataset.getTabletopDataset(d))
+    if use_my_dataset:
+        DatasetCatalog.register("tabletop_object_" + d, lambda d=d: TableTopDataset(d))
+    else:
+        DatasetCatalog.register("tabletop_object_" + d, lambda d=d: getTabletopDataset(d))
     MetadataCatalog.get("tabletop_object_" + d).set(thing_classes=['__background__', 'object'])
 metadata = MetadataCatalog.get("tabletop_object_train")
 

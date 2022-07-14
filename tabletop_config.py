@@ -10,7 +10,7 @@ def add_tabletop_config(cfg):
     cfg.INPUT.MIN_SIZE_TEST = (480,)
     cfg.INPUT.MAX_SIZE_TRAIN = 800
     cfg.INPUT.MAX_SIZE_TEST = 800
-    cfg.SOLVER.MAX_ITER = 600
+    cfg.SOLVER.MAX_ITER = 2400
     #cfg.INPUT.CROP.ENABLED = False
     cfg.MODEL.WEIGHTS = "./output/model_final.pth"
     cfg.INPUT.MIN_SIZE_TEST = 0
