@@ -6,10 +6,14 @@ This script is a simplified version of the training script in detectron2/tools.
 """
 import sys
 import os
-print(os.path.dirname(__file__))
+#print(os.path.dirname(__file__))
 sys.path.append(os.path.dirname(__file__))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'lib'))
+
+import warnings
+warnings.simplefilter("ignore", UserWarning)
+
 try:
     # ignore ShapelyDeprecationWarning from fvcore
     from shapely.errors import ShapelyDeprecationWarning
@@ -260,7 +264,7 @@ def main(args):
         return res
 
     trainer = Trainer(cfg)
-    trainer.resume_or_load(resume=args.resume)
+    trainer.resume_or_load()
     return trainer.train()
 
 
