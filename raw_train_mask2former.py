@@ -133,6 +133,9 @@ def train_loop(dataloader, model, optimizer, current_epoch=0):
             if len(sample["instances"]) > 0:
                qualified_batch.append(sample)
         # print("after removing: ", len(qualified_batch))
+        # skip empty batch
+        if len(qualified_batch) == 0:
+            continue
         X = qualified_batch
         loss_dict = model(X)
         detailed_loss = [(k, round(v.item(), 3)) for k,v in loss_dict.items()]
