@@ -1,11 +1,15 @@
 # check some functions
 import sys
 import os
-print(os.path.dirname(__file__))
+# print(os.path.dirname(__file__))
 sys.path.append(os.path.dirname(__file__))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'lib'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'lib', 'datasets'))
+
+# ignore some warnings
+import warnings
+warnings.simplefilter("ignore", UserWarning)
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.modeling import build_model
 
