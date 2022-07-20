@@ -129,6 +129,8 @@ def visualizeResult():
 
 
 if __name__ == '__main__':
+    cfg.MODEL.WEIGHTS = "./output/model_16_epochs.pth"
+    cfg.SOLVER.MAX_ITER = 4000
     trainer = Trainer(cfg)
     trainer.resume_or_load()
     trainer.train()
