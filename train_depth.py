@@ -256,8 +256,8 @@ def setup(args):
     cfg.INPUT.INPUT_IMAGE = 'DEPTH'
     cfg.OUTPUT_DIR = './depth_output'
     cfg.MODEL.WEIGHTS = "./depth_output/model_final.pth"
-    cfg.SOLVER.MAX_ITER = 6000
-    cfg.SOLVER.CHECKPOINT_PERIOD = 1000
+    cfg.SOLVER.MAX_ITER = 11000
+    cfg.SOLVER.CHECKPOINT_PERIOD = 2000
     # cfg.merge_from_file(args.config_file)
     # cfg.merge_from_list(args.opts)
     cfg.freeze()
@@ -283,7 +283,7 @@ def main(args):
         return res
 
     trainer = Trainer(cfg)
-    trainer.resume_or_load()
+    trainer.resume_or_load(False)
     return trainer.train()
 
 
