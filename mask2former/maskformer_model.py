@@ -43,6 +43,7 @@ class MaskFormer(nn.Module):
         panoptic_on: bool,
         instance_on: bool,
         test_topk_per_image: int,
+        input_image: str,
     ):
         """
         Args:
@@ -89,6 +90,7 @@ class MaskFormer(nn.Module):
         self.instance_on = instance_on
         self.panoptic_on = panoptic_on
         self.test_topk_per_image = test_topk_per_image
+        self.input_image = input_image
 
         if not self.semantic_on:
             assert self.sem_seg_postprocess_before_inference
@@ -158,6 +160,7 @@ class MaskFormer(nn.Module):
             "instance_on": cfg.MODEL.MASK_FORMER.TEST.INSTANCE_ON,
             "panoptic_on": cfg.MODEL.MASK_FORMER.TEST.PANOPTIC_ON,
             "test_topk_per_image": cfg.TEST.DETECTIONS_PER_IMAGE,
+            "input_image": cfg.INPUT.INPUT_IMAGE,
         }
 
     @property
@@ -190,10 +193,14 @@ class MaskFormer(nn.Module):
                     segments_info (list[dict]): Describe each segment in `panoptic_seg`.
                         Each dict contains keys "id", "category_id", "isthing".
         """
-        images = [x["image"].to(self.device) for x in batched_inputs]
-        images = [(x - self.pixel_mean) / self.pixel_std for x in images]
-        images = ImageList.from_tensors(images, self.size_divisibility)
+        # print(f"input format: {self.input_image}")
+        if self.input_image == 'DEPTH':
+            images = [x["depth"].to(self.device) for x in batched_inputs]
+        else:
+            images = [x["image"].to(self.device) for x in batched_inputs]
+            images = [(x - self.pixel_mean) / self.pixel_std for x in images]
 
+        images = ImageList.from_tensors(images, self.size_divisibility)
         features = self.backbone(images.tensor)
         outputs = self.sem_seg_head(features)
 
