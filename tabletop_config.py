@@ -32,6 +32,6 @@ def add_tabletop_config(cfg):
     cfg.TEST.EVAL_PERIOD = 0
     cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES = 1
 
-    cfg.TEST.DETECTIONS_PER_IMAGE = 15
+    cfg.TEST.DETECTIONS_PER_IMAGE = 20
     #
     cfg.SOLVER.BASE_LR = 0.0001
