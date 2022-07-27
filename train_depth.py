@@ -254,10 +254,11 @@ def setup(args):
     cfg.merge_from_file(cfg_file)
     add_tabletop_config(cfg)
     cfg.INPUT.INPUT_IMAGE = 'DEPTH'
-    cfg.OUTPUT_DIR = './depth_output'
-    cfg.MODEL.WEIGHTS = "./depth_output/model_final.pth"
-    cfg.SOLVER.MAX_ITER = 11000
-    cfg.SOLVER.CHECKPOINT_PERIOD = 2000
+    cfg.OUTPUT_DIR = './depth_output_lr1e-5'
+    #cfg.MODEL.WEIGHTS = "./depth_output/model_0027999.pth"
+    cfg.SOLVER.MAX_ITER = 181000
+    cfg.SOLVER.CHECKPOINT_PERIOD = 5e3
+    cfg.SOLVER.BASE_LR = 1e-5
     # cfg.merge_from_file(args.config_file)
     # cfg.merge_from_list(args.opts)
     cfg.freeze()

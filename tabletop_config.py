@@ -13,7 +13,7 @@ def add_tabletop_config(cfg):
     cfg.SOLVER.MAX_ITER = 280000
     cfg.SOLVER.CHECKPOINT_PERIOD = 17500
     #cfg.INPUT.CROP.ENABLED = False
-    cfg.MODEL.WEIGHTS = "./output/model_final.pth"
+    # cfg.MODEL.WEIGHTS = "./output/model_final.pth"
     cfg.INPUT.MIN_SIZE_TEST = 0
     cfg.MODEL.MASK_FORMER.TEST.SEMANTIC_ON = False
     cfg.MODEL.MASK_FORMER.TEST.INSTANCE_ON = True
@@ -30,3 +30,6 @@ def add_tabletop_config(cfg):
     cfg.INPUT.INPUT_IMAGE = 'RGB'
     # no evaluation during training
     cfg.TEST.EVAL_PERIOD = 0
+
+    #
+    cfg.SOLVER.BASE_LR: 0.0001
