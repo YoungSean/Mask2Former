@@ -253,15 +253,16 @@ def setup(args):
     cfg_file = "configs/coco/instance-segmentation/maskformer2_R50_bs16_50ep.yaml"
     cfg.merge_from_file(cfg_file)
     add_tabletop_config(cfg)
-    #cfg.INPUT.INPUT_IMAGE = 'DEPTH'
-    cfg.INPUT.INPUT_IMAGE = 'RGBD_ADD'
-    cfg.OUTPUT_DIR = './rgbd_add_demo_output'
+    cfg.INPUT.INPUT_IMAGE = 'DEPTH'
+    #cfg.INPUT.INPUT_IMAGE = 'RGBD_ADD'
+    #cfg.OUTPUT_DIR = './rgbd_add_demo_output'
+    cfg.OUTPUT_DIR = "./depth_output_n1_lr5"
     if cfg.INPUT.INPUT_IMAGE.startswith('RGBD'):
         cfg.MODEL.WEIGHTS = ""
-    cfg.SOLVER.MAX_ITER = 2000
-    cfg.SOLVER.CHECKPOINT_PERIOD = 1000
-    cfg.SOLVER.BASE_LR = 1e-4
-    cfg.SOLVER.IMS_PER_BATCH = 4
+    cfg.SOLVER.MAX_ITER = 70000
+    cfg.SOLVER.CHECKPOINT_PERIOD = 5000
+    cfg.SOLVER.BASE_LR = 1e-5
+    cfg.SOLVER.IMS_PER_BATCH = 16
     # cfg.merge_from_file(args.config_file)
     # cfg.merge_from_list(args.opts)
     cfg.freeze()

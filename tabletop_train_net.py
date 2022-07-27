@@ -284,9 +284,11 @@ def setup(args):
     add_tabletop_config(cfg)
     # cfg.merge_from_file(args.config_file)
     # cfg.merge_from_list(args.opts)
+    # cfg.SOLVER.MAX_ITER = 4000
+    # cfg.SOLVER.CHECKPOINT_PERIOD = 1000
     cfg.OUTPUT_DIR = "./output_RGB"
-    cfg.SOLVER.MAX_ITER = 4000
-    cfg.SOLVER.CHECKPOINT_PERIOD = 1000
+    cfg.SOLVER.MAX_ITER = 70000
+    cfg.SOLVER.CHECKPOINT_PERIOD = 5e3
     cfg.freeze()
     default_setup(cfg, args)
     # Setup logger for "mask_former" module
