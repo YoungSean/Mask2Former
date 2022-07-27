@@ -30,7 +30,7 @@ def add_tabletop_config(cfg):
     cfg.INPUT.INPUT_IMAGE = 'RGB'
     # no evaluation during training
     cfg.TEST.EVAL_PERIOD = 0
-    cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES = 1
+    cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES = 2
 
     cfg.TEST.DETECTIONS_PER_IMAGE = 20
     #

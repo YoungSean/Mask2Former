@@ -286,9 +286,10 @@ def setup(args):
     # cfg.merge_from_list(args.opts)
     # cfg.SOLVER.MAX_ITER = 4000
     # cfg.SOLVER.CHECKPOINT_PERIOD = 1000
-    cfg.OUTPUT_DIR = "./output_RGB"
-    cfg.SOLVER.MAX_ITER = 70000
-    cfg.SOLVER.CHECKPOINT_PERIOD = 5e3
+    cfg.OUTPUT_DIR = "./output_RGB_n2"
+    cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES = 2
+    cfg.SOLVER.MAX_ITER = 2000
+    cfg.SOLVER.CHECKPOINT_PERIOD = 1000
     cfg.freeze()
     default_setup(cfg, args)
     # Setup logger for "mask_former" module
