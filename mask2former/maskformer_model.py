@@ -1,4 +1,5 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
+from copy import deepcopy
 from typing import Tuple
 
 import torch
@@ -44,6 +45,7 @@ class MaskFormer(nn.Module):
         instance_on: bool,
         test_topk_per_image: int,
         input_image: str,
+        backbone_depth: Backbone,
     ):
         """
         Args:
@@ -71,6 +73,8 @@ class MaskFormer(nn.Module):
         """
         super().__init__()
         self.backbone = backbone
+        if input_image.startswith('RGBD'):
+            self.backbone_depth = backbone_depth
         self.sem_seg_head = sem_seg_head
         self.criterion = criterion
         self.num_queries = num_queries
@@ -98,6 +102,10 @@ class MaskFormer(nn.Module):
     @classmethod
     def from_config(cls, cfg):
         backbone = build_backbone(cfg)
+        if cfg.INPUT.INPUT_IMAGE.startswith('RGBD'):
+            backbone_depth = build_backbone(cfg)
+        else:
+            backbone_depth = None
         sem_seg_head = build_sem_seg_head(cfg, backbone.output_shape())
 
         # Loss parameters:
@@ -161,6 +169,7 @@ class MaskFormer(nn.Module):
             "panoptic_on": cfg.MODEL.MASK_FORMER.TEST.PANOPTIC_ON,
             "test_topk_per_image": cfg.TEST.DETECTIONS_PER_IMAGE,
             "input_image": cfg.INPUT.INPUT_IMAGE,
+            "backbone_depth": backbone_depth,
         }
 
     @property
@@ -196,13 +205,27 @@ class MaskFormer(nn.Module):
         # print(f"input format: {self.input_image}")
         if self.input_image == 'DEPTH':
             images = [x["depth"].to(self.device) for x in batched_inputs]
+            #print("loading depth images")
         else:
             images = [x["image"].to(self.device) for x in batched_inputs]
             images = [(x - self.pixel_mean) / self.pixel_std for x in images]
 
         images = ImageList.from_tensors(images, self.size_divisibility)
         features = self.backbone(images.tensor)
-        outputs = self.sem_seg_head(features)
+        # need a new backbone!
+
+        if self.input_image == 'RGBD_ADD':
+            # print("rgb backbone: ", id(self.backbone))
+            # print("depth backbone: ", id(self.backbone_depth))
+            images_depth = [x["depth"].to(self.device) for x in batched_inputs]
+            images_depth = ImageList.from_tensors(images_depth, self.size_divisibility)
+            features_depth = self.backbone_depth(images_depth.tensor)
+            add_features = features_depth
+            for key in features_depth.keys():
+                add_features[key] = add_features[key] + features[key]
+            outputs = self.sem_seg_head(add_features)
+        else:
+            outputs = self.sem_seg_head(features)
 
         if self.training:
             # mask classification target
