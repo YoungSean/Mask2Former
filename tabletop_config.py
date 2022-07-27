@@ -1,6 +1,6 @@
 def add_tabletop_config(cfg):
-    cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
-    cfg.SOLVER.IMS_PER_BATCH = 16 #8,64,16
+    #cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
+    cfg.SOLVER.IMS_PER_BATCH = 4 #8,64,16
     cfg.INPUT.MASK_FORMAT = "bitmask"  # alternative: "polygon"
     cfg.MODEL.MASK_ON = True
     cfg.DATASETS.TRAIN = ("tabletop_object_train",)
@@ -30,6 +30,8 @@ def add_tabletop_config(cfg):
     cfg.INPUT.INPUT_IMAGE = 'RGB'
     # no evaluation during training
     cfg.TEST.EVAL_PERIOD = 0
+    cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES = 1
 
+    cfg.TEST.DETECTIONS_PER_IMAGE = 15
     #
-    cfg.SOLVER.BASE_LR: 0.0001
+    cfg.SOLVER.BASE_LR = 0.0001
