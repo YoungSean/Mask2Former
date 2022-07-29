@@ -279,17 +279,18 @@ def setup(args):
     # for poly lr schedule
     add_deeplab_config(cfg)
     add_maskformer2_config(cfg)
-    cfg_file = "configs/coco/instance-segmentation/maskformer2_R50_bs16_50ep.yaml"
+    #cfg_file = "configs/coco/instance-segmentation/maskformer2_R50_bs16_50ep.yaml"
+    cfg_file = "configs/coco/instance-segmentation/swin/maskformer2_swin_base_384_bs16_50ep.yaml"
     cfg.merge_from_file(cfg_file)
     add_tabletop_config(cfg)
     # cfg.merge_from_file(args.config_file)
     # cfg.merge_from_list(args.opts)
     # cfg.SOLVER.MAX_ITER = 4000
     # cfg.SOLVER.CHECKPOINT_PERIOD = 1000
-    cfg.OUTPUT_DIR = "./output_RGB_n2"
-    cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES = 2
-    cfg.SOLVER.MAX_ITER = 2000
-    cfg.SOLVER.CHECKPOINT_PERIOD = 1000
+    cfg.OUTPUT_DIR = "./output_RGB_swimB_np"
+    cfg.MODEL.WEIGHTS = ""
+    cfg.SOLVER.MAX_ITER = 10000
+    cfg.SOLVER.CHECKPOINT_PERIOD = 5000
     cfg.freeze()
     default_setup(cfg, args)
     # Setup logger for "mask_former" module
