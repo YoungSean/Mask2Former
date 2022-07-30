@@ -287,9 +287,9 @@ def setup(args):
     # cfg.merge_from_list(args.opts)
     # cfg.SOLVER.MAX_ITER = 4000
     # cfg.SOLVER.CHECKPOINT_PERIOD = 1000
-    cfg.OUTPUT_DIR = "./output_RGB_swimB_np"
+    cfg.OUTPUT_DIR = "./output_RGB_swimB_np2"
     cfg.MODEL.WEIGHTS = ""
-    cfg.SOLVER.MAX_ITER = 10000
+    cfg.SOLVER.MAX_ITER = 200
     cfg.SOLVER.CHECKPOINT_PERIOD = 5000
     cfg.freeze()
     default_setup(cfg, args)

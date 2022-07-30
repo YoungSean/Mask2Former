@@ -102,6 +102,14 @@ class MaskFormerInstanceDatasetMapper:
         aug_input, transforms = T.apply_transform_gens(self.tfm_gens, aug_input)
         image = aug_input.image
 
+        # # deal with depth images like RGB images
+        depth = dataset_dict["raw_depth"]
+        # now we get the depth whose transforms is the same as RGB images
+        depth = transforms.apply_image(depth)
+        #aug_input_depth = T.AugInput(depth)
+        #aug_input_depth, transforms_depth = T.apply_transform_gens(self.tfm_gens, aug_input_depth)
+        #depth = aug_input_depth.image
+
         # transform instnace masks
         assert "annotations" in dataset_dict
         for anno in dataset_dict["annotations"]:
@@ -140,6 +148,7 @@ class MaskFormerInstanceDatasetMapper:
 
         # Pad image and segmentation label here!
         image = torch.as_tensor(np.ascontiguousarray(image.transpose(2, 0, 1)))
+        depth = torch.as_tensor(np.ascontiguousarray(depth.transpose(2, 0, 1)))
         masks = [torch.from_numpy(np.ascontiguousarray(x)) for x in masks]
 
         classes = [int(obj["category_id"]) for obj in annos]
@@ -155,6 +164,7 @@ class MaskFormerInstanceDatasetMapper:
             ]
             # pad image
             image = F.pad(image, padding_size, value=128).contiguous()
+            depth = F.pad(depth, padding_size, value=128).contiguous()
             # pad mask
             masks = [F.pad(x, padding_size, value=0).contiguous() for x in masks]
 
@@ -164,6 +174,7 @@ class MaskFormerInstanceDatasetMapper:
         # but not efficient on large generic data structures due to the use of pickle & mp.Queue.
         # Therefore it's important to use torch.Tensor.
         dataset_dict["image"] = image
+        dataset_dict["depth"] = depth
 
         # Prepare per-category binary masks
         instances = Instances(image_shape)

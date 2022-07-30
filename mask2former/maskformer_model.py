@@ -207,6 +207,7 @@ class MaskFormer(nn.Module):
             images = [x["depth"].to(self.device) for x in batched_inputs]
             #print("loading depth images")
         else:
+            #print("use RGB")
             images = [x["image"].to(self.device) for x in batched_inputs]
             images = [(x - self.pixel_mean) / self.pixel_std for x in images]
 
@@ -298,13 +299,13 @@ class MaskFormer(nn.Module):
             # pad gt
             gt_masks = targets_per_image.gt_masks
 
-            #padded_masks = torch.zeros((gt_masks.shape[0], h_pad, w_pad), dtype=gt_masks.dtype, device=gt_masks.device)
-            #padded_masks[:, : gt_masks.shape[1], : gt_masks.shape[2]] = gt_masks
+            padded_masks = torch.zeros((gt_masks.shape[0], h_pad, w_pad), dtype=gt_masks.dtype, device=gt_masks.device)
+            padded_masks[:, : gt_masks.shape[1], : gt_masks.shape[2]] = gt_masks
             new_targets.append(
                 {
                     "labels": targets_per_image.gt_classes,
-                    #"masks": padded_masks,
-                    "masks": gt_masks.tensor,
+                    "masks": padded_masks,
+                    #"masks": gt_masks.tensor,
                 }
             )
         return new_targets

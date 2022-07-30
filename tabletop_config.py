@@ -22,7 +22,8 @@ def add_tabletop_config(cfg):
     cfg.DATALOADER.NUM_WORKERS = 4
 
     # set input data mapper
-    cfg.INPUT.DATASET_MAPPER_NAME == "mask_former_instance"
+    cfg.INPUT.DATASET_MAPPER_NAME = "mask_former_instance"
+    cfg.INPUT.RANDOM_FLIP = "none" # no flip for default dataloader
     # Same image size
     cfg.CUDNN_BENCHMARK = True
     # set output dir

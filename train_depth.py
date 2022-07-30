@@ -254,19 +254,22 @@ def setup(args):
     #cfg_file = "configs/coco/instance-segmentation/swin/maskformer2_swin_base_384_bs16_50ep.yaml"
     cfg.merge_from_file(cfg_file)
     add_tabletop_config(cfg)
+    #cfg.INPUT.DATASET_MAPPER_NAME = "mask_former_instance"
     cfg.INPUT.INPUT_IMAGE = 'DEPTH'
     #cfg.INPUT.INPUT_IMAGE = 'RGBD_ADD'
+    cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES = 2
     cfg.MODEL.WEIGHTS = ""
-    cfg.OUTPUT_DIR = "./depth_R50_lr4"
+    cfg.OUTPUT_DIR = "./depth_R50_lr4_noflip3"
     #cfg.OUTPUT_DIR = './depth_lr4_SwinB_woPretrained/'
     #cfg.MODEL.WEIGHTS = './depth_lr5_wo_pretrained_14000/model_final.pth'
-    #cfg.MODEL.WEIGHTS = './depth_lr4_wo_pretrained/model_final.pth'
+    #cfg.MODEL.WEIGHTS = './depth_R50_lr4_reverse/model_final.pth'
     if cfg.INPUT.INPUT_IMAGE.startswith('RGBD'):
         cfg.MODEL.WEIGHTS = ""
-    cfg.SOLVER.MAX_ITER = 6000
-    cfg.SOLVER.CHECKPOINT_PERIOD = 2000
+    cfg.SOLVER.MAX_ITER = 10000
+    cfg.SOLVER.CHECKPOINT_PERIOD = 4e3
     cfg.SOLVER.BASE_LR = 1e-4
     cfg.SOLVER.IMS_PER_BATCH = 4
+
     # cfg.merge_from_file(args.config_file)
     # cfg.merge_from_list(args.opts)
     cfg.freeze()
@@ -292,7 +295,7 @@ def main(args):
         return res
 
     trainer = Trainer(cfg)
-    trainer.resume_or_load(False)
+    trainer.resume_or_load()
     return trainer.train()
 
 
