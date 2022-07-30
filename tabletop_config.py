@@ -12,6 +12,7 @@ def add_tabletop_config(cfg):
     cfg.INPUT.MAX_SIZE_TEST = 800
     cfg.SOLVER.MAX_ITER = 280000
     cfg.SOLVER.CHECKPOINT_PERIOD = 17500
+    cfg.SOLVER.STEPS = (17500, 35000)
     #cfg.INPUT.CROP.ENABLED = False
     # cfg.MODEL.WEIGHTS = "./output/model_final.pth"
     cfg.INPUT.MIN_SIZE_TEST = 0

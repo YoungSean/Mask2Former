@@ -259,15 +259,15 @@ def setup(args):
     #cfg.INPUT.INPUT_IMAGE = 'RGBD_ADD'
     cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES = 2
     cfg.MODEL.WEIGHTS = ""
-    cfg.OUTPUT_DIR = "./depth_R50_lr4_noflip3"
+    cfg.OUTPUT_DIR = "./depth_R50_lr4_noflip6"
     #cfg.OUTPUT_DIR = './depth_lr4_SwinB_woPretrained/'
     #cfg.MODEL.WEIGHTS = './depth_lr5_wo_pretrained_14000/model_final.pth'
-    #cfg.MODEL.WEIGHTS = './depth_R50_lr4_reverse/model_final.pth'
+    cfg.MODEL.WEIGHTS = './depth_R50_lr4_noflip4/model_0003999.pth'
     if cfg.INPUT.INPUT_IMAGE.startswith('RGBD'):
         cfg.MODEL.WEIGHTS = ""
-    cfg.SOLVER.MAX_ITER = 10000
-    cfg.SOLVER.CHECKPOINT_PERIOD = 4e3
-    cfg.SOLVER.BASE_LR = 1e-4
+    cfg.SOLVER.MAX_ITER = 2000
+    cfg.SOLVER.CHECKPOINT_PERIOD = 2e3
+    cfg.SOLVER.BASE_LR = 1e-5
     cfg.SOLVER.IMS_PER_BATCH = 4
 
     # cfg.merge_from_file(args.config_file)
