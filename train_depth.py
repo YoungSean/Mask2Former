@@ -67,12 +67,7 @@ from mask2former import (
 from datasets.tabletop_dataset import TableTopDataset, getTabletopDataset
 from tabletop_config import add_tabletop_config
 
-
-
 dataset = TableTopDataset(data_mapper=True)
-
-# sample = dataset[5]
-# print(dataset[5].keys)
 
 class Trainer(DefaultTrainer):
     """
@@ -250,24 +245,24 @@ def setup(args):
     # for poly lr schedule
     add_deeplab_config(cfg)
     add_maskformer2_config(cfg)
-    cfg_file = "configs/coco/instance-segmentation/maskformer2_R50_bs16_50ep.yaml"
-    #cfg_file = "configs/coco/instance-segmentation/swin/maskformer2_swin_base_384_bs16_50ep.yaml"
+    #cfg_file = "configs/coco/instance-segmentation/maskformer2_R50_bs16_50ep.yaml"
+    cfg_file = "configs/coco/instance-segmentation/swin/maskformer2_swin_base_384_bs16_50ep.yaml"
     cfg.merge_from_file(cfg_file)
     add_tabletop_config(cfg)
     #cfg.INPUT.DATASET_MAPPER_NAME = "mask_former_instance"
-    #cfg.INPUT.INPUT_IMAGE = 'DEPTH'
-    cfg.INPUT.INPUT_IMAGE = 'RGBD_ADD'
+    cfg.INPUT.INPUT_IMAGE = 'DEPTH'
+    #cfg.INPUT.INPUT_IMAGE = 'RGBD_ADD'
     cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES = 2
-    cfg.MODEL.WEIGHTS = ""
-    cfg.OUTPUT_DIR = "./rgbdadd_R50_lr4_4000"
+    cfg.MODEL.WEIGHTS = "./depth_swimB_lr4_4000/model_final.pth"
+    cfg.OUTPUT_DIR = "./depth_swimB_lr4_4000"
     #cfg.OUTPUT_DIR = './depth_lr4_SwinB_woPretrained/'
-    cfg.MODEL.WEIGHTS = './rgbdadd_R50_lr4/model_final.pth'
+    #cfg.MODEL.WEIGHTS = './rgbdadd_R50_lr4/model_final.pth'
     # cfg.MODEL.WEIGHTS = './depth_R50_lr4_noflip4/model_0003999.pth'
     # if cfg.INPUT.INPUT_IMAGE.startswith('RGBD'):
     #     cfg.MODEL.WEIGHTS = ""
-    cfg.SOLVER.MAX_ITER = 2000
+    cfg.SOLVER.MAX_ITER = 8000
     cfg.SOLVER.CHECKPOINT_PERIOD = 2e3
-    cfg.SOLVER.BASE_LR = 1e-5
+    cfg.SOLVER.BASE_LR = 1e-4
     cfg.SOLVER.IMS_PER_BATCH = 4
     cfg.SOLVER.STEPS = (1000,)
 
